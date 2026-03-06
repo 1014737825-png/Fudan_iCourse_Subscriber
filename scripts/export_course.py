@@ -29,8 +29,15 @@ from src import config  # noqa: E402
 from src.database import Database  # noqa: E402
 from src.emailer import _EMAIL_CSS, _PYGMENTS_CSS, _md_to_html  # noqa: E402
 
+# Override hardcoded pixel dimensions for PDF rendering.
+# WeasyPrint maps CSS px to physical size at 96 DPI, which makes the
+# pre-scaled latex images appear too small. This CSS lets the renderer
+# size them naturally based on the image's intrinsic dimensions instead.
+_PDF_LATEX_CSS = "img { max-width: 100% !important; height: auto !important; }"
 
-def _build_html(course_title: str, teacher: str, lectures: list[dict]) -> str:
+
+def _build_html(course_title: str, teacher: str, lectures: list[dict],
+                pdf: bool = False) -> str:
     """Build a complete styled HTML document from course summaries."""
     body_parts = [
         f"<h1>{escape(course_title)}</h1>",
@@ -45,10 +52,11 @@ def _build_html(course_title: str, teacher: str, lectures: list[dict]) -> str:
         body_parts.append(_md_to_html(lec["summary"]))
         body_parts.append("<hr>")
 
+    extra_css = f"\n{_PDF_LATEX_CSS}" if pdf else ""
     return (
         "<!DOCTYPE html>"
         "<html><head><meta charset='utf-8'>"
-        f"<style>{_EMAIL_CSS}\n{_PYGMENTS_CSS}</style>"
+        f"<style>{_EMAIL_CSS}\n{_PYGMENTS_CSS}{extra_css}</style>"
         "</head><body>"
         + "\n".join(body_parts)
         + "</body></html>"
@@ -155,7 +163,7 @@ def main():
         print("Email configuration incomplete. Set SMTP_EMAIL, SMTP_PASSWORD, RECEIVER_EMAIL.")
         sys.exit(1)
 
-    html = _build_html(course_title, teacher, lectures)
+    html = _build_html(course_title, teacher, lectures, pdf=args.pdf)
     subject = f"[iCourse 课程摘要导出] {course_title}"
 
     if args.pdf:
