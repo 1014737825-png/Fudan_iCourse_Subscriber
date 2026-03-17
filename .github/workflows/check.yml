@@ -46,14 +46,14 @@ jobs:
             silero_vad.onnx
           key: asr-models-sensevoice-2024-07-17
 
-      - name: Download ASR models
-        if: steps.cache-models.outputs.cache-hit != 'true'
-        run: |
-          wget -q https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.tar.bz2
-          tar xf sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.tar.bz2
-          rm sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.tar.bz2
-          wget -q https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
-
+   - name: Download ASR models
+  if: steps.cache-models.outputs.cache-hit != 'true'
+  run: |
+    wget -q https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2025-01-04.tar.bz2
+    tar xf sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2025-01-04.tar.bz2
+    rm sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2025-01-04.tar.bz2
+    wget -q https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
+    
       - name: Fetch database from data branch
         run: |
           mkdir -p data
